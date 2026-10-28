@@ -1,30 +1,27 @@
-from flask import Flask
 from pathlib import Path
 
+from flask import Flask
+
 app = Flask(__name__)
+VERSION_FILE = Path(__file__).resolve().parent / "version.txt"
 
 
-@app.route("/")
+@app.route("/", methods=["GET"])
 def home():
     return {
-        "message": "Platform Demo App v3"
+        "service": "end-to-end-gitops-cloud-platform",
+        "message": "End-to-End GitOps Cloud Platform API",
     }
 
 
-@app.route("/health")
+@app.route("/health", methods=["GET"])
 def health():
-    return {
-        "status": "healthy"
-    }
+    return {"status": "healthy"}
 
 
-@app.route("/version")
+@app.route("/version", methods=["GET"])
 def version():
-    version_file = Path("version.txt")
-
-    return {
-        "version": version_file.read_text().strip()
-    }
+    return {"version": VERSION_FILE.read_text().strip()}
 
 
 if __name__ == "__main__":

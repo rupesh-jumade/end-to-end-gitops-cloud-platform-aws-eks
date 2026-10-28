@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gitops-platform
+  labels:
+    app.kubernetes.io/name: gitops-platform
+    app.kubernetes.io/part-of: end-to-end-gitops-cloud-platform
+spec:
+  type: {{ .Values.service.type }}
+  selector:
+    app.kubernetes.io/name: gitops-platform
+  ports:
+    - name: http
+      protocol: TCP
+      port: {{ .Values.service.port }}
+      targetPort: http
