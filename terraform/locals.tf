@@ -1,10 +1,8 @@
 locals {
   common_tags = {
-    Project     = "platform-demo-app"
+    Project     = "end-to-end-gitops-cloud-platform"
     Environment = "dev"
     Owner       = "rupesh"
     ManagedBy   = "Terraform"
   }
-
-  bucket_prefix = "platform-demo"
 }

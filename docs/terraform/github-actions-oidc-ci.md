@@ -1,86 +1,60 @@
-# Terraform + GitHub Actions CI
+
+# Terraform CI and AWS Deployment Strategy
 
 ## Objective
 
-Use GitHub Actions to automatically validate Terraform
-and generate a Terraform plan.
+Validate Terraform code automatically without requiring AWS credentials or provisioning AWS resources during routine development.
 
-## Workflow
+## Current Workflow
 
-Pull Request:
-- terraform fmt -check
-- terraform init -backend=false
-- terraform validate
+The GitHub Actions workflow is `.github/workflows/terraform.yml`.
 
-Push to main:
-- GitHub OIDC authentication
-- terraform fmt -check
-- terraform init
-- terraform validate
-- terraform plan
+On pushes to `main` and pull requests targeting `main`, when the configured path filters match, the workflow runs:
 
-No automatic terraform apply.
+1. Check out the repository.
+2. Set up Terraform version 1.16.1.
+3. Check Terraform formatting.
+4. Initialize Terraform with `-backend=false`.
+5. Validate the Terraform configuration.
 
-## GitHub OIDC
+This workflow does not authenticate to AWS, access the remote Terraform state, generate an AWS-backed plan, or apply infrastructure changes.
 
-OIDC = OpenID Connect.
+## Remote Terraform State
 
-GitHub Actions obtains an OIDC token.
-AWS IAM validates the token and allows the workflow
-to assume the GitHubActions-Terraform-Role.
+The new project uses a dedicated S3 backend:
 
-This avoids long-lived AWS access keys in GitHub.
+- Bucket: `end-to-end-gitops-aws-eks-tfstate-058862856960`
+- State key: `dev/terraform.tfstate`
+- Region: `ap-south-1`
+- State locking: S3 lock file enabled
 
-## AWS IAM
+The backend is configured in `terraform/backend.tf`.
 
-Components:
+The old `platform-demo-app` Terraform state and IAM permissions must remain separate and unchanged.
 
-1. GitHub OIDC provider
-2. IAM role
-3. IAM trust policy
-4. Terraform CI permissions policy
+## Planned AWS Integration
 
-The trust policy controls WHO can assume the role.
+The AWS deployment workflow will be implemented separately after local development and configuration reviews are complete.
 
-The permissions policy controls WHAT the role can do.
+The planned integration includes:
 
-## Terraform Remote State
+- GitHub Actions authentication to AWS using OpenID Connect (OIDC).
+- A dedicated IAM role trusted only by the new GitHub repository and intended branch or deployment environment.
+- Least-privilege permissions for the required AWS operations.
+- Remote-state access scoped to the new project's state bucket and state key.
+- Reviewed Terraform plans before infrastructure changes.
+- No automatic `terraform apply` without an explicit, reviewed deployment process.
 
-Terraform uses an S3 backend with state locking.
+## Security Requirements
 
-CI can:
-- read/write Terraform state
-- create/delete the lock file
-- read the Terraform-managed S3 resources
+- Do not store long-lived AWS access keys in GitHub.
+- Do not reuse the old project's IAM role or state permissions.
+- Do not commit Terraform plan files or state files.
+- Restrict AWS permissions to the minimum required for the workflow.
+- Review costs and the proposed Terraform plan before deploying AWS infrastructure.
 
-## Troubleshooting
+## Current Status
 
-Initial Terraform plan failed because the CI role
-did not have all S3 read permissions required by
-the aws_s3_bucket resource refresh.
+Terraform formatting and validation have succeeded locally.
 
-Errors encountered included:
-
-- s3:GetBucketPolicy
-- s3:GetBucketAcl
-- s3:GetBucketCORS
-- s3:GetBucketWebsite
-
-The final solution was to provide read-only s3:Get*
-permissions scoped to the two Terraform-managed buckets,
-rather than adding individual permissions indefinitely.
-
-## Final Result
-
-GitHub Actions successfully authenticated to AWS using OIDC.
-
-Terraform successfully executed:
-
-- fmt -check
-- init
-- validate
-- plan
-
-Final plan:
-
-No changes. Your infrastructure matches the configuration.
+The current Terraform GitHub Actions workflow is validation-only. AWS OIDC authentication, remote-state access from CI, and live infrastructure deployment remain future implementation tasks.
