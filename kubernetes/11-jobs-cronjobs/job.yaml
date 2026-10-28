@@ -1,14 +1,14 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: platform-demo-job
+  name: gitops-platform-job
 spec:
   backoffLimit: 3
 
   template:
     metadata:
       labels:
-        app: platform-demo-job
+        app: gitops-platform-job
 
     spec:
       restartPolicy: Never

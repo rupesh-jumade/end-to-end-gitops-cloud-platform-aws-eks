@@ -1,14 +1,14 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: platform-demo-failing-job
+  name: gitops-platform-failing-job
 spec:
   backoffLimit: 2
 
   template:
     metadata:
       labels:
-        app: platform-demo-failing-job
+        app: gitops-platform-failing-job
 
     spec:
       restartPolicy: Never

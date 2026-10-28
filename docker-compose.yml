@@ -2,7 +2,7 @@ services:
 
   app:
     build: .
-    container_name: platform-demo-app
+    container_name: gitops-platform-app
 
     ports:
       - "5000:5000"

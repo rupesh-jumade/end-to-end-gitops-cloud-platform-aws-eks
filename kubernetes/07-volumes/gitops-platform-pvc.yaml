@@ -2,7 +2,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 
 metadata:
-  name: platform-demo-pvc
+  name: gitops-platform-pvc
 
 spec:
   accessModes:

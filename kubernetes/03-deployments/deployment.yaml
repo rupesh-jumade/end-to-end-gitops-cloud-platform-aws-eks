@@ -26,15 +26,15 @@ spec:
 
         envFrom:
         - configMapRef:
-            name: platform-demo-config
+            name: gitops-platform-config
         - secretRef:
-            name: platform-demo-secret
+            name: gitops-platform-secret
 
         env:
         - name: DATABASE_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: platform-demo-secret
+              name: gitops-platform-secret
               key: DATABASE_PASSWORD
 
         volumeMounts:
@@ -63,5 +63,5 @@ spec:
         emptyDir: {}
       - name: persistent-data
         persistentVolumeClaim:
-          claimName: platform-demo-pvc
+          claimName: gitops-platform-pvc
 

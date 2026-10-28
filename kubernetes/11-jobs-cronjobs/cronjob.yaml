@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: platform-demo-cronjob
+  name: gitops-platform-cronjob
 spec:
   schedule: "*/2 * * * *"
 
@@ -15,7 +15,7 @@ spec:
       template:
         metadata:
           labels:
-            app: platform-demo-cronjob
+            app: gitops-platform-cronjob
 
         spec:
           restartPolicy: Never
